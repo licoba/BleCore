@@ -1,0 +1,1 @@
+- 在BleDevice里添加了一个新字段：uuid

@@ -10,6 +10,7 @@ package com.bhm.ble.device
 import android.bluetooth.BluetoothDevice
 import android.os.Bundle
 import android.os.Parcel
+import android.os.ParcelUuid
 import android.os.Parcelable
 
 
@@ -22,6 +23,7 @@ import android.os.Parcelable
  * @param timestampNanos 当扫描记录被观察到时，返回自启动以来的时间戳。
  * @param scanRecord 被扫描到时候携带的广播数据
  * @param tag 预留字段
+ * @param uuids 设备的服务UUID列表
  *
  * @author Buhuiming
  * @date 2023年05月22日 09时11分
@@ -34,8 +36,8 @@ data class BleDevice(
     val timestampNanos: Long?,
     val scanRecord: ByteArray?,
     val tag: Bundle?,
+    val uuids: List<ParcelUuid>? = null
 ) : Parcelable {
-
     constructor(parcel: Parcel) : this(
         parcel.readParcelable(BluetoothDevice::class.java.classLoader),
         parcel.readString(),
@@ -43,7 +45,8 @@ data class BleDevice(
         parcel.readValue(Int::class.java.classLoader) as? Int,
         parcel.readValue(Long::class.java.classLoader) as? Long,
         parcel.createByteArray(),
-        parcel.readBundle(Bundle::class.java.classLoader)
+        parcel.readBundle(Bundle::class.java.classLoader),
+        parcel.createTypedArrayList(ParcelUuid.CREATOR)
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -54,6 +57,7 @@ data class BleDevice(
         parcel.writeValue(timestampNanos)
         parcel.writeByteArray(scanRecord)
         parcel.writeBundle(tag)
+        parcel.writeTypedList(uuids)
     }
 
     override fun describeContents(): Int {
