@@ -94,4 +94,7 @@ data class BleDevice(
 
     fun getKey() = deviceAddress.toString()
 
+
+    fun getFirstUuid() = uuids?.get(0)?.uuid.toString()
+
 }
