@@ -50,7 +50,7 @@ internal abstract class Request {
      */
     fun getOperateInterval(): Long {
         var operateInterval = getBleOptions()?.operateInterval ?: DEFAULT_OPERATE_INTERVAL
-        if (operateInterval <= 0) {
+        if (operateInterval < 0) {
             operateInterval = DEFAULT_OPERATE_INTERVAL
         }
         return operateInterval

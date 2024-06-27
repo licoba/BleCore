@@ -49,7 +49,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         lifecycleScope.launch {
             //添加扫描到的设备 刷新列表
             viewModel.listDRStateFlow.collect {
-                if (it.deviceName != null && it.deviceAddress != null) {
+                if (it.deviceAddress != null) {
                     val position = (listAdapter?.itemCount?: 1) - 1
                     listAdapter?.notifyItemInserted(position)
                     viewBinding.recyclerView.smoothScrollToPosition(position)

@@ -197,7 +197,8 @@ internal class BleTaskQueue(private val tag: String = "") {
         }
         mCoroutineScope?.launch {
             //两次操作之间最好间隔一小段时间，如100ms（具体时间可以根据自己实际蓝牙外设自行尝试延长或缩短）
-            delay(task.operateInterval)
+            if (task.operateInterval > 0)
+                delay(task.operateInterval)
             //任务还在队列中并且未取消才执行
             if (taskList.contains(task) && !task.canceled.get()) {
                 tryHandleTask(task)
