@@ -37,6 +37,7 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlin.math.max
+import kotlin.random.Random
 
 
 /**
@@ -47,7 +48,7 @@ import kotlin.math.max
  */
 internal class BleWriteRequest(
     private val bleDevice: BleDevice,
-) : BleTaskQueueRequest(bleDevice, "Write队列") {
+) : BleTaskQueueRequest(bleDevice, "Write队列${Random.nextInt(1, 100)}") {
 
     private val bleWriteDataHashMap:
             ConcurrentHashMap<String, MutableList<BleWriteData>> = ConcurrentHashMap()
@@ -60,8 +61,7 @@ internal class BleWriteRequest(
     /**
      * 添加任务线程
      */
-    private val singleThreadContext = newSingleThreadContext("SingleThreadContext")
-    private val addWriteJobScope = CoroutineScope(singleThreadContext)
+    private val addWriteJobScope = CoroutineScope(newSingleThreadContext("addWriteJobScope"))
 
     /**
      * 写队列线程
@@ -140,27 +140,21 @@ internal class BleWriteRequest(
             return
         }
         addWriteJobScope.launch {
-            if (linkedBlockingQueue.isEmpty()) {
-                for (i in 0 until dataArray.size()) {
-                    val data = dataArray.valueAt(i)
-                    withContext(Dispatchers.IO) {
-                        linkedBlockingQueue.put(data)
-                    }
-                    startWriteQueueJob(
-                        serviceUUID,
-                        writeUUID,
-                        operateRandomID,
-                        skipErrorPacketData,
-                        retryWriteCount,
-                        retryDelayTime,
-                        bleWriteCallback
-                    )
-                }
-                return@launch
-            }
             for (i in 0 until dataArray.size()) {
                 val data = dataArray.valueAt(i)
+                BleLogger.i("添加了任务 ${BleUtil.bytesToHex(data)}")
                 linkedBlockingQueue.put(data)
+            }
+            if (linkedBlockingQueue.isNotEmpty()) {
+                startWriteQueueJob(
+                    serviceUUID,
+                    writeUUID,
+                    operateRandomID,
+                    skipErrorPacketData,
+                    retryWriteCount,
+                    retryDelayTime,
+                    bleWriteCallback
+                )
             }
         }
     }
