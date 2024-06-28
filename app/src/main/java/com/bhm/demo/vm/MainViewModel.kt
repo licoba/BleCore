@@ -56,7 +56,8 @@ class MainViewModel(private val application: Application) : BaseViewModel(applic
      * 初始化蓝牙组件
      */
     fun initBle() {
-        BleManager.get().init(application,
+        BleManager.get().init(
+            application,
             BleOptions.Builder()
                 .setScanMillisTimeOut(5000)
                 .setConnectMillisTimeOut(5000)
@@ -164,29 +165,21 @@ class MainViewModel(private val application: Application) : BaseViewModel(applic
             }
             onLeScan { bleDevice, _ ->
                 //可以根据currentScanCount是否已有清空列表数据
-                bleDevice.deviceName?.let { _ ->
 
-                }
             }
             onLeScanDuplicateRemoval { bleDevice, _ ->
-                bleDevice.deviceName?.let { _ ->
-                    if (showData) {
-                        listDRData.add(bleDevice)
-                        listDRMutableStateFlow.value = bleDevice
-                    }
+                if (showData) {
+                    listDRData.add(bleDevice)
+                    listDRMutableStateFlow.value = bleDevice
                 }
             }
             onScanComplete { bleDeviceList, bleDeviceDuplicateRemovalList ->
                 //扫描到的数据是所有扫描次数的总和
                 bleDeviceList.forEach {
-                    it.deviceName?.let { deviceName ->
-                        BleLogger.i("bleDeviceList-> $deviceName, ${it.deviceAddress}")
-                    }
+                    BleLogger.i("bleDeviceList->  ${it.deviceAddress}")
                 }
                 bleDeviceDuplicateRemovalList.forEach {
-                    it.deviceName?.let { deviceName ->
-                        BleLogger.e("bleDeviceDuplicateRemovalList-> $deviceName, ${it.deviceAddress}")
-                    }
+                    BleLogger.e("bleDeviceDuplicateRemovalList->  ${it.deviceAddress}")
                 }
                 scanStopMutableStateFlow.value = true
                 if (listDRData.isEmpty() && showData) {
@@ -278,8 +271,10 @@ class MainViewModel(private val application: Application) : BaseViewModel(applic
             BleLogger.e("-----${bleDevice.deviceAddress} -> onDisConnecting: $isActiveDisConnected")
         }
         onDisConnected { isActiveDisConnected, bleDevice, _, _ ->
-            Toast.makeText(application, "断开连接(${bleDevice.deviceAddress}，isActiveDisConnected: " +
-                    "$isActiveDisConnected)", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                application, "断开连接(${bleDevice.deviceAddress}，isActiveDisConnected: " +
+                        "$isActiveDisConnected)", Toast.LENGTH_SHORT
+            ).show()
             BleLogger.e("-----${bleDevice.deviceAddress} -> onDisConnected: $isActiveDisConnected")
             refreshMutableStateFlow.value = RefreshBleDevice(bleDevice, System.currentTimeMillis())
             //发送断开的通知
@@ -288,7 +283,8 @@ class MainViewModel(private val application: Application) : BaseViewModel(applic
             EventBus.getDefault().post(message)
         }
         onConnectSuccess { bleDevice, _ ->
-            Toast.makeText(application, "连接成功(${bleDevice.deviceAddress})", Toast.LENGTH_SHORT).show()
+            Toast.makeText(application, "连接成功(${bleDevice.deviceAddress})", Toast.LENGTH_SHORT)
+                .show()
             refreshMutableStateFlow.value = RefreshBleDevice(bleDevice, System.currentTimeMillis())
         }
     }
