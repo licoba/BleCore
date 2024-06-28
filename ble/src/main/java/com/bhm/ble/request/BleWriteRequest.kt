@@ -115,6 +115,7 @@ internal class BleWriteRequest(
         dataArray: SparseArray<ByteArray>,
         skipErrorPacketData: Boolean = false,
         retryWriteCount: Int = 0,
+        retryDelayTime: Long = 0L,
         bleWriteCallback: BleWriteCallback
     ) {
         if (!BleUtil.isPermission(getBleManager().getContext())) {
@@ -144,6 +145,7 @@ internal class BleWriteRequest(
                         operateRandomID,
                         skipErrorPacketData,
                         retryWriteCount,
+                        retryDelayTime,
                         bleWriteCallback
                     )
                 }
@@ -309,6 +311,7 @@ internal class BleWriteRequest(
         operateRandomID: String,
         skipErrorPacketData: Boolean = false,
         retryWriteCount: Int = 0,
+        retryDelayTime:Long = 20, // 写失败之后，延迟的时间
         bleWriteCallback: BleWriteCallback
     ) {
         writeJobScope.launch {
@@ -324,6 +327,7 @@ internal class BleWriteRequest(
                         operateRandomID,
                         true,
                         retryWriteCount,
+                        retryDelayTime,
                         bleWriteCallback
                     )
                 }
@@ -349,7 +353,7 @@ internal class BleWriteRequest(
                             launchInIOThread {
                                 currentRetryWriteCount.set(currentRetryWriteCount.get() + 1)
                                 val isCancelRetry = currentRetryWriteCount.get() > retryWriteCount
-                                BleLogger.e("写失败，指定重试${retryWriteCount}次，是否进入下一次重试：${!isCancelRetry}")
+                                BleLogger.e("写失败，指定重试${retryWriteCount}次， 是否进入下一次重试：${!isCancelRetry}")
                                 if (isCancelRetry) {
                                     //如果重试了retryWriteCount次还是失败，则丢掉此包，写下一包
                                     currentRetryWriteCount.set(0)
@@ -357,7 +361,8 @@ internal class BleWriteRequest(
                                         linkedBlockingQueue.poll()
                                     }
                                 }
-                                delay(200L + (max(currentRetryWriteCount.get(), 1) - 1)* 1000)
+//                                delay(200L + (max(currentRetryWriteCount.get(), 1) - 1)* 1000)
+                                delay(retryDelayTime)
                                 if (linkedBlockingQueue.isNotEmpty()) {
                                     startWriteQueueJob(
                                         serviceUUID,
@@ -365,6 +370,7 @@ internal class BleWriteRequest(
                                         operateRandomID,
                                         skipErrorPacketData,
                                         retryWriteCount,
+                                        retryDelayTime,
                                         bleWriteCallback
                                     )
                                 }
@@ -390,6 +396,7 @@ internal class BleWriteRequest(
                                     operateRandomID,
                                     skipErrorPacketData,
                                     retryWriteCount,
+                                    retryDelayTime,
                                     bleWriteCallback
                                 )
                             }

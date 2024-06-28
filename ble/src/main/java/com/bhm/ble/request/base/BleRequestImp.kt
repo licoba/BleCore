@@ -479,13 +479,14 @@ internal class BleRequestImp private constructor() : BleBaseRequest {
         dataArray: SparseArray<ByteArray>,
         skipErrorPacketData: Boolean,
         retryWriteCount: Int,
+        retryDelayTime:Long,
         bleWriteCallback: BleWriteCallback.() -> Unit
     ) {
         val callback = BleWriteCallback()
         callback.apply(bleWriteCallback)
         val request = bleConnectedDeviceManager.getBleConnectedDevice(bleDevice)
         request?.let {
-            it.writeQueueData(serviceUUID, writeUUID, dataArray, skipErrorPacketData, retryWriteCount, callback)
+            it.writeQueueData(serviceUUID, writeUUID, dataArray, skipErrorPacketData, retryWriteCount, retryDelayTime, callback)
             return
         }
         val exception = UnConnectedException("$writeUUID -> 写数据失败，设备未连接")

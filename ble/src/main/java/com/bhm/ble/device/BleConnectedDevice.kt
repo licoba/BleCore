@@ -414,6 +414,7 @@ internal class BleConnectedDevice(val bleDevice: BleDevice) : BluetoothGattCallb
                        dataArray: SparseArray<ByteArray>,
                        skipErrorPacketData: Boolean = false,
                        retryWriteCount: Int = 0,
+                       retryDelayTime:Long = 0L,
                        bleWriteCallback: BleWriteCallback) {
         //以时间戳为id，来标记一次写操作
         initBleWriteRequest()
@@ -424,6 +425,7 @@ internal class BleConnectedDevice(val bleDevice: BleDevice) : BluetoothGattCallb
             dataArray,
             skipErrorPacketData,
             retryWriteCount,
+            retryDelayTime,
             bleWriteCallback
         )
     }

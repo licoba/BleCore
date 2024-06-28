@@ -625,6 +625,7 @@ class BleManager private constructor() {
                        data: ByteArray,
                        skipErrorPacketData: Boolean = false,
                        retryWriteCount: Int = 0,
+                       retryDelayTime: Long = 0L,
                        bleWriteCallback: BleWriteCallback.() -> Unit) {
         writeQueueData(
             bleDevice,
@@ -635,6 +636,7 @@ class BleManager private constructor() {
             },
             skipErrorPacketData,
             retryWriteCount,
+            retryDelayTime,
             bleWriteCallback
         )
     }
@@ -655,6 +657,7 @@ class BleManager private constructor() {
                        dataArray: SparseArray<ByteArray>,
                        skipErrorPacketData: Boolean = false,
                        retryWriteCount: Int = 0,
+                       retryDelayTime: Long = 0L,
                        bleWriteCallback: BleWriteCallback.() -> Unit) {
         checkInitialize()
         bleBaseRequest?.writeQueueData(
@@ -664,6 +667,7 @@ class BleManager private constructor() {
             dataArray,
             skipErrorPacketData,
             retryWriteCount,
+            retryDelayTime,
             bleWriteCallback
         )
     }

@@ -169,6 +169,7 @@ internal interface BleBaseRequest {
                        dataArray: SparseArray<ByteArray>,
                        skipErrorPacketData: Boolean = false,
                        retryWriteCount: Int = 0,
+                       retryDelayTime: Long = 0L,
                        bleWriteCallback: BleWriteCallback.() -> Unit)
 
     /**
